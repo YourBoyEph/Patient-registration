@@ -1,0 +1,116 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+void registerPatient();
+void viewPatients();
+void searchPatient();
+
+int main() {
+    int choice;
+
+    do {
+        printf("\n--- HOSPITAL PATIENT REGISTRATION SYSTEM ---\n");
+        printf("1. Register Patient\n");
+        printf("2. View All Patients\n");
+        printf("3. Search Patient by ID\n");
+        printf("4. Exit\n");
+        printf("Enter your choice: ");
+        scanf("%d", &choice);
+
+        switch(choice) {
+            case 1:
+                registerPatient();
+                break;
+            case 2:
+                viewPatients();
+                break;
+            case 3:
+                searchPatient();
+                break;
+            case 4:
+                printf("Exiting program...\n");
+                break;
+            default:
+                printf("Invalid choice!\n");
+        }
+    } while(choice != 4);
+
+    return 0;
+}
+
+void registerPatient() {
+    FILE *fp;
+    int id;
+    char name[50];
+    char diagnosis[50];
+
+    fp = fopen("patients.txt", "a");
+
+    if (fp == NULL) {
+        printf("Error opening file!\n");
+        return;
+    }
+
+    printf("Enter patient ID: ");
+    scanf("%d", &id);
+    printf("Enter patient name: ");
+    scanf(" %[^\n]", name);
+    printf("Enter diagnosis: ");
+    scanf(" %[^\n]", diagnosis);
+
+    fprintf(fp, "%d | %s | %s\n", id, name, diagnosis);
+    fclose(fp);
+
+    printf("Patient registered successfully.\n");
+}
+
+void viewPatients() {
+    FILE *fp;
+    char ch;
+
+    fp = fopen("patients.txt", "r");
+
+    if (fp == NULL) {
+        printf("No patient records found!\n");
+        return;
+    }
+
+    printf("\n--- PATIENT RECORDS ---\n");
+    while ((ch = fgetc(fp)) != EOF) {
+        putchar(ch);
+    }
+
+    fclose(fp);
+}
+
+void searchPatient() {
+    FILE *fp;
+    int searchID, id;
+    char name[50], diagnosis[50];
+    int found = 0;
+
+    fp = fopen("patients.txt", "r");
+
+    if (fp == NULL) {
+        printf("File not found!\n");
+        return;
+    }
+
+    printf("Enter patient ID to search: ");
+    scanf("%d", &searchID);
+
+    while (fscanf(fp, "%d | %[^|] | %[^\n]\n", &id, name, diagnosis) != EOF) {
+        if (id == searchID) {
+            printf("\nPatient Found:\n");
+            printf("ID: %d\nName: %s\nDiagnosis: %s\n", id, name, diagnosis);
+            found = 1;
+            break;
+        }
+    }
+
+    if (!found) {
+        printf("Patient not found.\n");
+    }
+
+    fclose(fp);
+}
